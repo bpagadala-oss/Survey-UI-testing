@@ -2,8 +2,8 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 
-const PORT = 5555;
-const HOST = 'localhost';
+const PORT = process.env.PORT || 5555;
+const HOST = '0.0.0.0';
 
 const server = http.createServer((req, res) => {
   let filePath = req.url === '/' ? '/app.html' : req.url;
