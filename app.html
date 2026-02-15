@@ -1,0 +1,2581 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Smart Order - iPad 11" App</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+      padding: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    }
+
+    /* ========== iPad FRAME ========== */
+    .ipad-frame {
+      width: 1194px;
+      height: 834px;
+      background: #000;
+      border-radius: 56px;
+      padding: 16px;
+      box-shadow: 0 0 60px rgba(0, 0, 0, 0.8),
+                  0 20px 60px rgba(0, 0, 0, 0.6),
+                  inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      position: relative;
+    }
+
+    /* iPad Glass Effect */
+    .ipad-frame::before {
+      content: '';
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      right: 16px;
+      bottom: 16px;
+      border-radius: 48px;
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(0, 0, 0, 0.1) 100%);
+      pointer-events: none;
+    }
+
+    /* Home Indicator */
+    .ipad-frame::after {
+      content: '';
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 120px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 2px;
+      z-index: 100;
+    }
+
+    /* iPad Screen */
+    .ipad-screen {
+      width: 100%;
+      height: 100%;
+      background: #f8fafc;
+      border-radius: 44px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* App Container */
+    .app-container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(to bottom right, #f8fafc, #f1f5f9);
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ========== HEADER ========== */
+    .header {
+      background: white;
+      border-bottom: 1px solid #e2e8f0;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+      padding: 16px 32px;
+      flex-shrink: 0;
+    }
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      max-width: 100%;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .back-btn {
+      background: none;
+      border: none;
+      color: #0052CC;
+      font-size: 36px;
+      cursor: pointer;
+      transition: all 0.2s;
+      padding: 0;
+      line-height: 1;
+      font-weight: 400;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 30px;
+      height: 30px;
+    }
+
+    .back-btn:hover {
+      color: #0041A3;
+      transform: translateX(-2px);
+    }
+
+    .back-text {
+      color: #0052CC;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      line-height: 1.2;
+    }
+
+    .back-text:hover {
+      color: #0041A3;
+    }
+
+    .header-title {
+      font-size: 36px;
+      font-weight: bold;
+      color: #0f172a;
+      text-align: center;
+      flex: 1;
+    }
+
+    .ai-icon {
+      width: 48px;
+      height: 48px;
+      background: linear-gradient(135deg, #60a5fa, #2563eb);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 24px;
+      cursor: pointer;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      transition: box-shadow 0.2s;
+    }
+
+    .ai-icon:hover {
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.15);
+    }
+
+    /* ========== NEW FILTER BAR ========== */
+    .filter-bar {
+      background: white;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 14px 32px;
+      flex-shrink: 0;
+    }
+
+    .filter-bar-content {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    /* Expand All Button */
+    .expand-btn {
+      background: transparent;
+      border: none;
+      color: #64748b;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      padding: 6px 10px;
+      border-radius: 6px;
+    }
+
+    .expand-btn:hover {
+      background: #f1f5f9;
+      color: #0f172a;
+    }
+
+    .expand-icon {
+      display: inline-block;
+      transition: transform 0.3s;
+      font-size: 24px;
+    }
+
+    .expand-btn.expanded .expand-icon {
+      transform: rotate(90deg);
+    }
+
+    /* Search Bar Container */
+    .search-bar-container {
+      flex: 1;
+      min-width: 200px;
+      display: flex;
+      align-items: center;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 8px 12px;
+      transition: border-color 0.2s;
+    }
+
+    .search-bar-container:focus-within {
+      border-color: #0052CC;
+      background: #f8fafc;
+    }
+
+    .search-bar-container .search-icon {
+      font-size: 16px;
+      margin-right: 8px;
+      color: #94a3b8;
+    }
+
+    .search-bar-input {
+      background: transparent;
+      border: none;
+      outline: none;
+      flex: 1;
+      font-size: 14px;
+      color: #0f172a;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    }
+
+    .search-bar-input::placeholder {
+      color: #cbd5e1;
+    }
+
+    /* Filter Wrapper */
+    .filter-wrapper {
+      position: relative;
+      display: inline-block;
+    }
+
+    /* Filter Option */
+    .filter-option {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #0f172a;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      position: relative;
+    }
+
+    .filter-option:hover {
+      background: #f8fafc;
+      border-color: #0052CC;
+      color: #0052CC;
+    }
+
+    .filter-option-icon {
+      font-size: 16px;
+    }
+
+    .filter-option-text {
+      display: inline;
+    }
+
+    .filter-option-arrow {
+      font-size: 12px;
+      transition: transform 0.2s;
+    }
+
+    .filter-option.active .filter-option-arrow {
+      transform: rotate(180deg);
+    }
+
+    /* Filter Dropdown */
+    .filter-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      margin-top: 4px;
+      min-width: 200px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      display: none;
+      z-index: 1000;
+      overflow: hidden;
+    }
+
+    .filter-dropdown.show {
+      display: block;
+    }
+
+    .dropdown-item {
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #0f172a;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .dropdown-item:last-child {
+      border-bottom: none;
+    }
+
+    .dropdown-item:hover {
+      background: #f8fafc;
+    }
+
+    .item-icon {
+      font-size: 16px;
+    }
+
+    .checkmark {
+      margin-left: auto;
+      color: #0052CC;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    /* Add Products Button */
+    .add-products-btn {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 8px 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #0f172a;
+      font-size: 13px;
+      font-weight: 500;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    }
+
+    .add-products-btn:hover {
+      background: #f8fafc;
+      border-color: #0052CC;
+      color: #0052CC;
+    }
+
+    .add-icon {
+      font-size: 16px;
+    }
+
+    .add-text {
+      display: inline;
+    }
+
+    /* Scan Button */
+    .scan-btn {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 8px 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #0f172a;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .scan-btn:hover {
+      background: #f8fafc;
+      border-color: #0052CC;
+    }
+
+    .scan-icon {
+      font-size: 18px;
+    }
+
+    /* ========== BUTTON GROUP ========== */
+    .button-group {
+      display: flex;
+      gap: 0;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      overflow: hidden;
+      background: white;
+    }
+
+    .button-group-item {
+      background: white;
+      border: none;
+      border-right: 1px solid #e2e8f0;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #0f172a;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      flex: 1;
+    }
+
+    .button-group-item:last-child {
+      border-right: none;
+    }
+
+    .button-group-item:hover {
+      background: #f8fafc;
+      color: #0052CC;
+    }
+
+    .button-group-item:active {
+      background: #f0f4ff;
+    }
+
+    .scan-text {
+      display: inline;
+    }
+
+    /* ========== ACTIVITY GRID ========== */
+    .activities-row {
+      display: flex;
+      background: white;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    }
+
+    .activity-group-placeholder {
+      flex: 0 0 200px;
+      border-right: 1px solid #e2e8f0;
+    }
+
+    .activity-group {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+      padding: 12px 16px;
+      border-right: 1px solid #e2e8f0;
+    }
+
+    .activity-group-right {
+      border-right: none;
+    }
+
+    .activity-group.activity-group-left {
+      border-right: 1px solid #e2e8f0;
+    }
+
+    .activity-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    .info-icon {
+      font-size: 14px;
+      cursor: pointer;
+      opacity: 0.6;
+    }
+
+    .activity-grid {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+
+    .grid-header {
+      display: flex;
+      background: #f8fafc;
+      color: #0f172a;
+      font-weight: 600;
+      font-size: 13px;
+      border-bottom: 2px solid #e2e8f0;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .grid-row {
+      display: flex;
+      border-bottom: 1px solid #e2e8f0;
+      align-items: center;
+    }
+
+    .grid-col, .grid-cell {
+      padding: 14px 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .header-col-product {
+      flex: 0 0 200px;
+      justify-content: flex-start;
+      font-weight: 600;
+      text-align: left;
+    }
+
+    .header-col-activity {
+      flex: 1;
+      min-width: 100px;
+      text-align: left;
+      justify-content: flex-start;
+    }
+
+    /* Header specific alignments */
+    .header-col-activity.standard-activity:nth-child(2) {
+      justify-content: flex-end;
+      text-align: right;
+      padding-right: 12px;
+    }
+
+    .header-col-activity.standard-activity:nth-child(3) {
+      justify-content: flex-end;
+      text-align: right;
+      padding-right: 12px;
+    }
+
+    .header-col-activity.standard-activity:nth-child(4) {
+      justify-content: center;
+      text-align: center;
+    }
+
+    .header-col-activity.flashy-activity:nth-child(5) {
+      justify-content: flex-end;
+      text-align: right;
+      padding-right: 12px;
+    }
+
+    .header-col-activity.flashy-activity:nth-child(6) {
+      justify-content: center;
+      text-align: center;
+    }
+
+    .header-col-activity.flashy-activity:nth-child(7) {
+      justify-content: flex-start;
+      text-align: left;
+      padding-left: 12px;
+    }
+
+    .product-cell {
+      flex: 0 0 200px;
+      justify-content: flex-start;
+      font-weight: 600;
+      color: #0f172a;
+      font-size: 14px;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      background: white;
+      padding: 14px 12px;
+      gap: 10px;
+    }
+
+    .expand-arrow {
+      font-size: 18px;
+      color: #64748b;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    .expand-arrow.rotated {
+      transform: rotate(90deg);
+    }
+
+    .product-image {
+      font-size: 24px;
+    }
+
+    .product-details {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+    }
+
+    .product-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #0f172a;
+    }
+
+    .product-meta {
+      font-size: 12px;
+      color: #94a3b8;
+      font-weight: 400;
+    }
+
+    .input-cell {
+      flex: 1;
+      min-width: 100px;
+      padding: 8px;
+      justify-content: center;
+    }
+
+    /* Column specific alignments */
+    .grid-row .input-cell:nth-child(2) {
+      justify-content: flex-end;
+      padding-right: 12px;
+    }
+
+    .grid-row .input-cell:nth-child(3) {
+      justify-content: flex-end;
+      padding-right: 12px;
+    }
+
+    .grid-row .input-cell:nth-child(4) {
+      justify-content: center;
+    }
+
+    .grid-row .input-cell:nth-child(5) {
+      justify-content: flex-end;
+      padding-right: 12px;
+    }
+
+    .grid-row .input-cell:nth-child(6) {
+      justify-content: center;
+    }
+
+    .grid-row .input-cell:nth-child(7) {
+      justify-content: flex-start;
+      padding-left: 12px;
+    }
+
+    .input-cell input {
+      text-align: inherit;
+    }
+
+    .input-cell input[type="number"],
+    .input-cell input[type="text"] {
+      text-align: right;
+    }
+
+    .grid-row .input-cell:nth-child(4) input,
+    .grid-row .input-cell:nth-child(6) input {
+      text-align: center;
+    }
+
+    .grid-row .input-cell:nth-child(7) input,
+    .grid-row .input-cell:nth-child(7) select {
+      text-align: left;
+    }
+
+    .input-cell input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 2px solid #cbd5e1;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      background: white;
+      color: #0f172a;
+    }
+
+    .input-cell input:focus {
+      outline: none;
+      border-color: #0052CC;
+      box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.1);
+    }
+
+    .input-cell input::placeholder {
+      color: #cbd5e1;
+    }
+
+    /* Button Group Inline */
+    .button-group-inline {
+      display: flex;
+      gap: 0;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .yes-btn, .no-btn, .oqs-btn {
+      padding: 6px 10px;
+      border: none;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      background: white;
+      color: #0f172a;
+      flex: 1;
+      border-right: 1px solid #e2e8f0;
+    }
+
+    .yes-btn:last-child, .no-btn:last-child, .oqs-btn:last-child {
+      border-right: none;
+    }
+
+    .yes-btn {
+      background: #0052CC;
+      color: white;
+    }
+
+    .no-btn:hover, .oqs-btn:hover {
+      background: #f1f5f9;
+    }
+
+    .yes-btn.active {
+      background: #0052CC;
+      color: white;
+    }
+
+    .no-btn.active, .oqs-btn.active {
+      background: #0052CC;
+      color: white;
+    }
+
+    /* Toggle Inline */
+    .toggle-inline {
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .toggle-inline input {
+      display: none;
+    }
+
+    .toggle-slider {
+      width: 40px;
+      height: 22px;
+      background: #cbd5e1;
+      border-radius: 11px;
+      position: relative;
+      transition: background 0.3s;
+    }
+
+    .toggle-slider::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      background: white;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: left 0.3s;
+    }
+
+    .toggle-inline input:checked + .toggle-slider {
+      background: #0052CC;
+    }
+
+    .toggle-inline input:checked + .toggle-slider::after {
+      left: 20px;
+    }
+
+    /* Dropdown Inline */
+    .dropdown-inline {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      background: white;
+      color: #0f172a;
+      cursor: pointer;
+      transition: border-color 0.2s;
+    }
+
+    .dropdown-inline:focus {
+      outline: none;
+      border-color: #0052CC;
+      box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.1);
+    }
+
+    /* Activity Column Classes */
+    .standard-activity {
+      border-right: 1px solid #f1f5f9;
+    }
+
+    .flashy-activity {
+      border-right: 1px solid #f1f5f9;
+    }
+
+    .grid-header .standard-activity:nth-child(4) {
+      border-right: 2px solid #e2e8f0;
+    }
+
+    /* ========== DETAIL ROW ========== */
+    .detail-row {
+      display: none;
+      background: white;
+      border-bottom: 1px solid #e2e8f0;
+      padding: 16px;
+    }
+
+    .detail-row.show {
+      display: block;
+    }
+
+    .detail-content {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      align-items: flex-start;
+    }
+
+    .detail-section {
+      display: contents;
+    }
+
+    .detail-section-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0052CC;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      text-transform: capitalize;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 0;
+      grid-column: auto;
+      padding: 0;
+    }
+
+    .detail-section-title::before {
+      content: '';
+      width: 3px;
+      height: 3px;
+      background: #0052CC;
+      border-radius: 50%;
+    }
+
+    /* Product Details Section - Inline Title with Content */
+    .detail-content > .detail-section:first-of-type {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      align-items: flex-start;
+      grid-column: 1 / -1;
+    }
+
+    .detail-content > .detail-section:first-of-type .detail-section-title {
+      grid-column: 1 / -1;
+      margin-bottom: 12px;
+    }
+
+    .detail-content > .detail-section:first-of-type .detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 0;
+    }
+
+    /* Activity Sections - Keep as is */
+    .detail-content > .detail-section:nth-of-type(2),
+    .detail-content > .detail-section:nth-of-type(3) {
+      display: contents;
+    }
+
+    .detail-content > .detail-section:nth-of-type(2) .detail-section-title,
+    .detail-content > .detail-section:nth-of-type(3) .detail-section-title {
+      grid-column: 1 / -1;
+    }
+
+    .detail-content > .detail-section:nth-of-type(2) .detail-item,
+    .detail-content > .detail-section:nth-of-type(3) .detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 0;
+    }
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 0;
+    }
+
+    .detail-label {
+      font-size: 12px;
+      color: #64748b;
+      font-weight: 500;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      text-transform: capitalize;
+      letter-spacing: 0;
+    }
+
+    .detail-value {
+      font-size: 13px;
+      font-weight: 600;
+      color: #0f172a;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    }
+
+    /* Detail Divider */
+    .detail-divider {
+      width: 100%;
+      height: 1px;
+      background: #e2e8f0;
+      margin: 8px 0;
+      grid-column: 1 / -1;
+    }
+
+    /* Detail Input Fields */
+    .detail-input, .detail-select {
+      padding: 8px 10px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      transition: border-color 0.2s;
+      background: white;
+      color: #0f172a;
+      width: 100%;
+      height: 34px;
+    }
+
+    .detail-input:focus, .detail-select:focus {
+      outline: none;
+      border-color: #0052CC;
+      box-shadow: 0 0 0 3px rgba(0, 82, 204, 0.1);
+    }
+
+    .detail-input::placeholder {
+      color: #cbd5e1;
+    }
+
+    /* Detail section button group inline */
+    .detail-section .button-group-inline {
+      display: flex;
+      gap: 0;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      overflow: hidden;
+      width: 100%;
+      height: 34px;
+    }
+
+    .detail-section .yes-btn, 
+    .detail-section .no-btn, 
+    .detail-section .oqs-btn {
+      padding: 0;
+      border: none;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      background: white;
+      color: #0f172a;
+      flex: 1;
+      border-right: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .detail-section .yes-btn:last-child, 
+    .detail-section .no-btn:last-child, 
+    .detail-section .oqs-btn:last-child {
+      border-right: none;
+    }
+
+    .detail-section .yes-btn {
+      background: #0052CC;
+      color: white;
+    }
+
+    .detail-section .yes-btn.active {
+      background: #0052CC;
+      color: white;
+    }
+
+    .detail-section .no-btn.active, 
+    .detail-section .oqs-btn.active {
+      background: #0052CC;
+      color: white;
+    }
+
+    .detail-section .yes-btn:hover {
+      background: #0041A3;
+    }
+
+    .detail-section .no-btn:hover, 
+    .detail-section .oqs-btn:hover {
+      background: #f1f5f9;
+    }
+
+    /* Detail section toggle inline */
+    .detail-section .toggle-inline {
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .detail-section .toggle-inline input {
+      display: none;
+    }
+
+    .detail-section .toggle-slider {
+      width: 40px;
+      height: 22px;
+      background: #cbd5e1;
+      border-radius: 11px;
+      position: relative;
+      transition: background 0.3s;
+    }
+
+    .detail-section .toggle-slider::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      background: white;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: left 0.3s;
+    }
+
+    .detail-section .toggle-inline input:checked + .toggle-slider {
+      background: #0052CC;
+    }
+
+    .detail-section .toggle-inline input:checked + .toggle-slider::after {
+      left: 20px;
+    }
+
+    /* ========== NUMERIC KEYBOARD ========== */
+    .numeric-keyboard {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px 12px 0 0;
+      padding: 16px;
+      width: 100%;
+      max-width: 500px;
+      box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+
+    .numeric-keyboard.show {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .keyboard-input-display {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 18px;
+      font-weight: 600;
+      color: #0f172a;
+      text-align: right;
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    }
+
+    .keyboard-buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .key-btn {
+      padding: 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      background: white;
+      color: #0f172a;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    }
+
+    .key-btn:hover {
+      background: #f1f5f9;
+      border-color: #cbd5e1;
+    }
+
+    .key-btn:active {
+      background: #e2e8f0;
+      transform: scale(0.95);
+    }
+
+    .dot-btn {
+      color: #0052CC;
+      font-weight: 700;
+    }
+
+    .backspace-btn {
+      color: #ef4444;
+      font-weight: 700;
+    }
+
+    .keyboard-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .key-btn-cancel {
+      padding: 12px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      background: white;
+      color: #64748b;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    }
+
+    .key-btn-cancel:hover {
+      background: #f1f5f9;
+    }
+
+    .key-btn-ok {
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      background: #0052CC;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    }
+
+    .key-btn-ok:hover {
+      background: #0041A3;
+    }
+
+    .key-btn-ok:active {
+      transform: scale(0.95);
+    }
+
+    /* ========== CONTENT AREA ========== */
+    .content-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 32px;
+      background: #f8fafc;
+    }
+
+    .content-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* ========== FILTER SECTION ========== */
+    .filter-section {
+      margin-bottom: 32px;
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    .filter-buttons {
+      position: relative;
+    }
+
+    .filter-btn-group {
+      background: white;
+      border: 2px solid #dbeafe;
+      border-radius: 24px;
+      padding: 12px 20px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #0052CC;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    }
+
+    .filter-btn-group:hover {
+      background: #f0f4ff;
+      border-color: #0052CC;
+    }
+
+    .filter-btn-group.active {
+      background: #0052CC;
+      color: white;
+      border-color: #0052CC;
+    }
+
+    .filter-icon {
+      font-size: 18px;
+    }
+
+    .dropdown-arrow {
+      font-size: 12px;
+      margin-left: 8px;
+      transition: transform 0.2s;
+    }
+
+    .filter-btn-group.active .dropdown-arrow {
+      transform: rotate(180deg);
+    }
+
+    /* ========== FILTER DROPDOWN ========== */
+    .filter-dropdown {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      margin-top: 8px;
+      min-width: 220px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      display: none;
+      z-index: 1000;
+      overflow: hidden;
+    }
+
+    .filter-dropdown.show {
+      display: block;
+    }
+
+    .dropdown-item {
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      color: #0f172a;
+      font-size: 15px;
+      font-weight: 500;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      border-bottom: 1px solid #f1f5f9;
+    }
+
+    .dropdown-item:last-child {
+      border-bottom: none;
+    }
+
+    .dropdown-item:hover {
+      background: #f8fafc;
+    }
+
+    .item-icon {
+      font-size: 18px;
+    }
+
+    .checkmark {
+      margin-left: auto;
+      color: #0052CC;
+      font-weight: 700;
+      font-size: 16px;
+    }
+
+    .section {
+      margin-bottom: 48px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #0f172a;
+      margin-bottom: 20px;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    }
+
+    /* ========== PRODUCTS GRID ========== */
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .product-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s;
+      cursor: pointer;
+    }
+
+    .product-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .product-image {
+      font-size: 48px;
+      margin-bottom: 16px;
+      text-align: center;
+    }
+
+    .product-info {
+      text-align: left;
+    }
+
+    .product-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #0f172a;
+      margin-bottom: 8px;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    }
+
+    .product-price {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0052CC;
+      margin-bottom: 6px;
+    }
+
+    .product-stock {
+      font-size: 12px;
+      color: #64748b;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    }
+
+    /* ========== QUESTIONS GRID ========== */
+    .questions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 20px;
+    }
+
+    .question-card {
+      background: linear-gradient(135deg, #f0f4ff 0%, #f5f8ff 100%);
+      border: 1px solid #dbeafe;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+
+    .question-card:hover {
+      box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+      transform: translateY(-2px);
+      border-color: #0052CC;
+    }
+
+    .question-icon {
+      font-size: 40px;
+      margin-bottom: 12px;
+    }
+
+    .question-text {
+      font-size: 14px;
+      font-weight: 600;
+      color: #0f172a;
+      margin-bottom: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+      line-height: 1.4;
+    }
+
+    .question-btn {
+      background: #0052CC;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', 'Helvetica Neue', sans-serif;
+    }
+
+    .question-btn:hover {
+      background: #0041A3;
+      transform: scale(1.05);
+    }
+
+    /* ========== SCROLLBAR ========== */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (min-width: 1100px) and (max-height: 900px) {
+      /* iPad Pro 11" */
+      .header {
+        padding: 18px 28px;
+      }
+
+      .header-title {
+        font-size: 32px;
+      }
+
+      .ai-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 26px;
+      }
+
+      .back-btn {
+        font-size: 28px;
+      }
+
+      .nav-tabs {
+        padding: 14px 28px;
+        gap: 16px;
+      }
+
+      .tab-btn {
+        padding: 10px 22px;
+        font-size: 15px;
+      }
+
+      .search-filters {
+        padding: 14px 28px;
+        gap: 14px;
+      }
+
+      .search-input {
+        font-size: 15px;
+      }
+
+      .ai-toggle-label {
+        font-size: 13px;
+      }
+
+      .content-area {
+        padding: 28px;
+      }
+
+      .content-placeholder {
+        padding: 40px;
+        min-height: 320px;
+      }
+
+      .content-icon {
+        font-size: 56px;
+      }
+
+      .content-title {
+        font-size: 22px;
+      }
+
+      .content-text {
+        font-size: 14px;
+        max-width: 350px;
+      }
+
+      .content-badge {
+        font-size: 12px;
+        padding: 6px 12px;
+      }
+
+      .cards-grid {
+        gap: 20px;
+        grid-template-columns: repeat(3, 1fr);
+        margin-top: 20px;
+      }
+
+      .card {
+        min-height: 160px;
+        padding: 20px;
+      }
+
+      .card-icon {
+        font-size: 40px;
+      }
+
+      .card-text {
+        font-size: 13px;
+      }
+
+      .filter-btn, .chart-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+      }
+
+      .toggle-switch {
+        width: 44px;
+        height: 22px;
+      }
+
+      .toggle-thumb {
+        width: 18px;
+        height: 18px;
+      }
+
+      .toggle-switch.active .toggle-thumb {
+        left: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- iPad Frame -->
+  <div class="ipad-frame">
+    <div class="ipad-screen">
+      <div class="app-container">
+        <!-- HEADER -->
+        <div class="header">
+          <div class="header-content">
+            <div class="header-left">
+              <button class="back-btn" title="Go Back">‹</button>
+              <span class="back-text">Back</span>
+            </div>
+            <div class="header-title">Smart Order</div>
+            <div class="ai-icon" title="AI Assistant">⚡</div>
+          </div>
+        </div>
+
+        <!-- NEW FILTER BAR -->
+        <div class="filter-bar">
+          <div class="filter-bar-content">
+            <!-- Expand All Button -->
+            <button class="expand-btn" onclick="toggleExpandAll(this)" title="Expand All">
+              <span class="expand-icon">⬍</span>
+            </button>
+
+            <!-- Search Bar -->
+            <div class="search-bar-container">
+              <span class="search-icon">🔍</span>
+              <input type="text" class="search-bar-input" placeholder="Search products..." id="searchInput" onkeyup="updateSearch()">
+            </div>
+
+            <!-- Category Filter -->
+            <div class="filter-wrapper">
+              <button class="filter-option" onclick="toggleCategoryFilter()" id="categoryBtn">
+                <span class="filter-option-icon">📦</span>
+                <span class="filter-option-text">Category</span>
+                <span class="filter-option-arrow">▼</span>
+              </button>
+              <div class="filter-dropdown" id="categoryDropdown">
+                <div class="dropdown-item" onclick="selectCategory('all', this)">
+                  <span class="item-icon">📦</span>
+                  All Categories
+                  <span class="checkmark">✓</span>
+                </div>
+                <div class="dropdown-item" onclick="selectCategory('beverages', this)">
+                  <span class="item-icon">🥤</span>
+                  Beverages
+                </div>
+                <div class="dropdown-item" onclick="selectCategory('snacks', this)">
+                  <span class="item-icon">🍿</span>
+                  Snacks
+                </div>
+              </div>
+            </div>
+
+            <!-- Products Filter -->
+            <div class="filter-wrapper">
+              <button class="filter-option" onclick="toggleProductsFilter()" id="productsBtn">
+                <span class="filter-option-icon">🏷️</span>
+                <span class="filter-option-text">Products</span>
+                <span class="filter-option-arrow">▼</span>
+              </button>
+              <div class="filter-dropdown" id="productsDropdown">
+                <div class="dropdown-item" onclick="selectProduct('all', this)">
+                  <span class="item-icon">🏷️</span>
+                  All Products
+                  <span class="checkmark">✓</span>
+                </div>
+                <div class="dropdown-item" onclick="selectProduct('promoted', this)">
+                  <span class="item-icon">💰</span>
+                  Promoted
+                </div>
+                <div class="dropdown-item" onclick="selectProduct('discrepancies', this)">
+                  <span class="item-icon">⚠️</span>
+                  Discrepancies
+                </div>
+              </div>
+            </div>
+
+            <!-- Add Products and Scan Button Group -->
+            <div class="button-group">
+              <button class="button-group-item" onclick="addProducts()" title="Add Products">
+                <span class="add-icon">➕</span>
+                <span class="add-text">Add</span>
+              </button>
+              <button class="button-group-item" onclick="scanProduct()" title="Scan Product">
+                <span class="scan-icon">📱</span>
+                <span class="scan-text">Scan</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- CONTENT AREA -->
+        <div class="content-area">
+          <div class="content-container">
+            <!-- Products Activity Grid -->
+            <div class="activity-grid">
+              <!-- Activities Header Row (Grouped Columns - without Products) -->
+              <div class="activities-row">
+                <div class="activity-group-placeholder"></div>
+                <div class="activity-group activity-group-left">
+                  <span class="activity-title">Standard Survey Activities</span>
+                  <span class="info-icon">ℹ️</span>
+                </div>
+                <div class="activity-group activity-group-right">
+                  <span class="activity-title">Flashy Drinks</span>
+                  <span class="info-icon">ℹ️</span>
+                </div>
+              </div>
+
+              <!-- Grid Header (Column Names) -->
+              <div class="grid-header">
+                <div class="grid-col header-col-product">Products (115)</div>
+                <div class="grid-col header-col-activity standard-activity">Facings</div>
+                <div class="grid-col header-col-activity standard-activity">Price</div>
+                <div class="grid-col header-col-activity standard-activity">Distributed</div>
+                <div class="grid-col header-col-activity flashy-activity">Competitor Price</div>
+                <div class="grid-col header-col-activity flashy-activity">Adv. material placed?</div>
+                <div class="grid-col header-col-activity flashy-activity">Shelf level</div>
+              </div>
+
+              <!-- Product Rows -->
+              <div class="grid-row">
+                <div class="grid-cell product-cell">
+                  <span class="expand-arrow" onclick="toggleExpand(this)">›</span>
+                  <span class="product-image">🥤</span>
+                  <div class="product-details">
+                    <div class="product-name">Coca Cola 1.0L Pet</div>
+                    <div class="product-meta">Listed +4</div>
+                  </div>
+                </div>
+                <div class="grid-cell input-cell standard-activity"><input type="number" placeholder="5" value="5"></div>
+                <div class="grid-cell input-cell standard-activity"><input type="text" placeholder="3.50" value="3.50"></div>
+                <div class="grid-cell input-cell standard-activity">
+                  <div class="button-group-inline">
+                    <button class="yes-btn">Yes</button>
+                    <button class="no-btn">No</button>
+                    <button class="oqs-btn">OOS</button>
+                  </div>
+                </div>
+                <div class="grid-cell input-cell flashy-activity"><input type="text" placeholder="4.00" value="4.00"></div>
+                <div class="grid-cell input-cell flashy-activity">
+                  <label class="toggle-inline">
+                    <input type="checkbox" checked>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                <div class="grid-cell input-cell flashy-activity">
+                  <select class="dropdown-inline">
+                    <option>Eye</option>
+                    <option>Waist</option>
+                    <option>Knee</option>
+                  </select>
+                </div>
+              </div>
+              <div class="detail-row">
+                <div class="detail-content">
+                  <div class="detail-section-title">Product Details</div>
+                  <div class="detail-section">
+                    <div class="detail-item">
+                      <span class="detail-label">Product number</span>
+                      <span class="detail-value">7990000000003</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Gtin</span>
+                      <span class="detail-value">4010900000009</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Category</span>
+                      <span class="detail-value">Beverages</span>
+                    </div>
+                  </div>
+                  
+                  <div class="detail-divider"></div>
+                  
+                  <div class="detail-section-title">Standard Survey Activities</div>
+                  <div class="detail-section">
+                    <div class="detail-item">
+                      <span class="detail-label">Stock verification</span>
+                      <div class="button-group-inline">
+                        <button class="yes-btn">Yes</button>
+                        <button class="no-btn">No</button>
+                        <button class="oqs-btn">OOS</button>
+                      </div>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Surveyor notes</span>
+                      <input type="text" class="detail-input" placeholder="Add notes">
+                    </div>
+                  </div>
+                  
+                  <div class="detail-divider"></div>
+                  
+                  <div class="detail-section-title">Flashy Drinks</div>
+                  <div class="detail-section">
+                    <div class="detail-item">
+                      <span class="detail-label">Display quality</span>
+                      <select class="detail-select">
+                        <option>Excellent</option>
+                        <option>Good</option>
+                        <option>Average</option>
+                        <option>Poor</option>
+                      </select>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Promotion active</span>
+                      <label class="toggle-inline">
+                        <input type="checkbox">
+                        <span class="toggle-slider"></span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid-row">
+                <div class="grid-cell product-cell">
+                  <span class="expand-arrow" onclick="toggleExpand(this)">›</span>
+                  <span class="product-image">🥤</span>
+                  <div class="product-details">
+                    <div class="product-name">Sprite 2L Pet</div>
+                    <div class="product-meta">Listed +4</div>
+                  </div>
+                </div>
+                <div class="grid-cell input-cell standard-activity"><input type="number" placeholder="5" value="5"></div>
+                <div class="grid-cell input-cell standard-activity"><input type="text" placeholder="3.50"></div>
+                <div class="grid-cell input-cell standard-activity">
+                  <div class="button-group-inline">
+                    <button class="yes-btn">Yes</button>
+                    <button class="no-btn">No</button>
+                    <button class="oqs-btn">OOS</button>
+                  </div>
+                </div>
+                <div class="grid-cell input-cell flashy-activity"><input type="text" placeholder="4.00" value="4.00"></div>
+                <div class="grid-cell input-cell flashy-activity">
+                  <label class="toggle-inline">
+                    <input type="checkbox" checked>
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                <div class="grid-cell input-cell flashy-activity">
+                  <select class="dropdown-inline">
+                    <option>Eye</option>
+                    <option>Waist</option>
+                    <option>Knee</option>
+                  </select>
+                </div>
+              </div>
+              <div class="detail-row">
+                <div class="detail-content">
+                  <div class="detail-section-title">Product Details</div>
+                  <div class="detail-section">
+                    <div class="detail-item">
+                      <span class="detail-label">Product number</span>
+                      <span class="detail-value">7990000000010</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Gtin</span>
+                      <span class="detail-value">4010900000016</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Category</span>
+                      <span class="detail-value">Beverages</span>
+                    </div>
+                  </div>
+                  
+                  <div class="detail-divider"></div>
+                  
+                  <div class="detail-section-title">Standard Survey Activities</div>
+                  <div class="detail-section">
+                    <div class="detail-item">
+                      <span class="detail-label">Stock verification</span>
+                      <div class="button-group-inline">
+                        <button class="yes-btn">Yes</button>
+                        <button class="no-btn">No</button>
+                        <button class="oqs-btn">OOS</button>
+                      </div>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Surveyor notes</span>
+                      <input type="text" class="detail-input" placeholder="Add notes">
+                    </div>
+                  </div>
+                  
+                  <div class="detail-divider"></div>
+                  
+                  <div class="detail-section-title">Flashy Drinks</div>
+                  <div class="detail-section">
+                    <div class="detail-item">
+                      <span class="detail-label">Display quality</span>
+                      <select class="detail-select">
+                        <option>Excellent</option>
+                        <option>Good</option>
+                        <option>Average</option>
+                        <option>Poor</option>
+                      </select>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Promotion active</span>
+                      <label class="toggle-inline">
+                        <input type="checkbox">
+                        <span class="toggle-slider"></span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid-row">
+                <div class="grid-cell product-cell">
+                  <span class="expand-arrow" onclick="toggleExpand(this)">›</span>
+                  <span class="product-image">🍊</span>
+                  <div class="product-details">
+                    <div class="product-name">Fanta Orange 2L</div>
+                    <div class="product-meta">Listed +2</div>
+                  </div>
+                </div>
+                <div class="grid-cell input-cell standard-activity"><input type="number" placeholder="Count"></div>
+                <div class="grid-cell input-cell standard-activity"><input type="text" placeholder="Price"></div>
+                <div class="grid-cell input-cell standard-activity">
+                  <div class="button-group-inline">
+                    <button class="yes-btn">Yes</button>
+                    <button class="no-btn">No</button>
+                    <button class="oqs-btn">OOS</button>
+                  </div>
+                </div>
+                <div class="grid-cell input-cell flashy-activity"><input type="text" placeholder="Price"></div>
+                <div class="grid-cell input-cell flashy-activity">
+                  <label class="toggle-inline">
+                    <input type="checkbox">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                <div class="grid-cell input-cell flashy-activity">
+                  <select class="dropdown-inline">
+                    <option>Select</option>
+                    <option>Eye</option>
+                    <option>Waist</option>
+                    <option>Knee</option>
+                  </select>
+                </div>
+              </div>
+              <div class="detail-row">
+                <div class="detail-content">
+                  <div class="detail-section-title">Product Details</div>
+                  <div class="detail-section">
+                    <div class="detail-item">
+                      <span class="detail-label">Product number</span>
+                      <span class="detail-value">7990000000027</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Gtin</span>
+                      <span class="detail-value">4010900000023</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Category</span>
+                      <span class="detail-value">Beverages</span>
+                    </div>
+                  </div>
+                  
+                  <div class="detail-divider"></div>
+                  
+                  <div class="detail-section-title">Standard Survey Activities</div>
+                  <div class="detail-section">
+                    <div class="detail-item">
+                      <span class="detail-label">Stock verification</span>
+                      <div class="button-group-inline">
+                        <button class="yes-btn">Yes</button>
+                        <button class="no-btn">No</button>
+                        <button class="oqs-btn">OOS</button>
+                      </div>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Surveyor notes</span>
+                      <input type="text" class="detail-input" placeholder="Add notes">
+                    </div>
+                  </div>
+                  
+                  <div class="detail-divider"></div>
+                  
+                  <div class="detail-section-title">Flashy Drinks</div>
+                  <div class="detail-section">
+                    <div class="detail-item">
+                      <span class="detail-label">Display quality</span>
+                      <select class="detail-select">
+                        <option>Excellent</option>
+                        <option>Good</option>
+                        <option>Average</option>
+                        <option>Poor</option>
+                      </select>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Promotion active</span>
+                      <label class="toggle-inline">
+                        <input type="checkbox">
+                        <span class="toggle-slider"></span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid-row">
+                <div class="grid-cell product-cell">
+                  <span class="expand-arrow" onclick="toggleExpand(this)">›</span>
+                  <span class="product-image">🥛</span>
+                  <div class="product-details">
+                    <div class="product-name">Milk 1L</div>
+                    <div class="product-meta">Listed +1</div>
+                  </div>
+                </div>
+                <div class="grid-cell input-cell standard-activity"><input type="number" placeholder="Count"></div>
+                <div class="grid-cell input-cell standard-activity"><input type="text" placeholder="Price"></div>
+                <div class="grid-cell input-cell standard-activity">
+                  <div class="button-group-inline">
+                    <button class="yes-btn">Yes</button>
+                    <button class="no-btn">No</button>
+                    <button class="oqs-btn">OOS</button>
+                  </div>
+                </div>
+                <div class="grid-cell input-cell flashy-activity"><input type="text" placeholder="Price"></div>
+                <div class="grid-cell input-cell flashy-activity">
+                  <label class="toggle-inline">
+                    <input type="checkbox">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                <div class="grid-cell input-cell flashy-activity">
+                  <select class="dropdown-inline">
+                    <option>Select</option>
+                    <option>Eye</option>
+                    <option>Waist</option>
+                    <option>Knee</option>
+                  </select>
+                </div>
+              </div>
+              <div class="detail-row">
+                <div class="detail-content">
+                  <div class="detail-section-title">Product Details</div>
+                  <div class="detail-section">
+                    <div class="detail-item">
+                      <span class="detail-label">Product number</span>
+                      <span class="detail-value">7990000000034</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Gtin</span>
+                      <span class="detail-value">4010900000030</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Category</span>
+                      <span class="detail-value">Dairy</span>
+                    </div>
+                  </div>
+                  
+                  <div class="detail-divider"></div>
+                  
+                  <div class="detail-section-title">Standard Survey Activities</div>
+                  <div class="detail-section">
+                    <div class="detail-item">
+                      <span class="detail-label">Stock verification</span>
+                      <div class="button-group-inline">
+                        <button class="yes-btn">Yes</button>
+                        <button class="no-btn">No</button>
+                        <button class="oqs-btn">OOS</button>
+                      </div>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Surveyor notes</span>
+                      <input type="text" class="detail-input" placeholder="Add notes">
+                    </div>
+                  </div>
+                  
+                  <div class="detail-divider"></div>
+                  
+                  <div class="detail-section-title">Flashy Drinks</div>
+                  <div class="detail-section">
+                    <div class="detail-item">
+                      <span class="detail-label">Display quality</span>
+                      <select class="detail-select">
+                        <option>Excellent</option>
+                        <option>Good</option>
+                        <option>Average</option>
+                        <option>Poor</option>
+                      </select>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Promotion active</span>
+                      <label class="toggle-inline">
+                        <input type="checkbox">
+                        <span class="toggle-slider"></span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid-row">
+                <div class="grid-cell product-cell">
+                  <span class="expand-arrow" onclick="toggleExpand(this)">›</span>
+                  <span class="product-image">🍫</span>
+                  <div class="product-details">
+                    <div class="product-name">Chocolate Bar</div>
+                    <div class="product-meta">Listed +3</div>
+                  </div>
+                </div>
+                <div class="grid-cell input-cell standard-activity"><input type="number" placeholder="Count"></div>
+                <div class="grid-cell input-cell standard-activity"><input type="text" placeholder="Price"></div>
+                <div class="grid-cell input-cell standard-activity">
+                  <div class="button-group-inline">
+                    <button class="yes-btn">Yes</button>
+                    <button class="no-btn">No</button>
+                    <button class="oqs-btn">OOS</button>
+                  </div>
+                </div>
+                <div class="grid-cell input-cell flashy-activity"><input type="text" placeholder="Price"></div>
+                <div class="grid-cell input-cell flashy-activity">
+                  <label class="toggle-inline">
+                    <input type="checkbox">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                <div class="grid-cell input-cell flashy-activity">
+                  <select class="dropdown-inline">
+                    <option>Select</option>
+                    <option>Eye</option>
+                    <option>Waist</option>
+                    <option>Knee</option>
+                  </select>
+                </div>
+              </div>
+              <div class="detail-row">
+                <div class="detail-content">
+                  <div class="detail-section-title">Product Details</div>
+                  <div class="detail-section">
+                    <div class="detail-item">
+                      <span class="detail-label">Product number</span>
+                      <span class="detail-value">7990000000041</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Gtin</span>
+                      <span class="detail-value">4010900000047</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Category</span>
+                      <span class="detail-value">Snacks</span>
+                    </div>
+                  </div>
+                  
+                  <div class="detail-divider"></div>
+                  
+                  <div class="detail-section-title">Standard Survey Activities</div>
+                  <div class="detail-section">
+                    <div class="detail-item">
+                      <span class="detail-label">Stock verification</span>
+                      <div class="button-group-inline">
+                        <button class="yes-btn">Yes</button>
+                        <button class="no-btn">No</button>
+                        <button class="oqs-btn">OOS</button>
+                      </div>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Surveyor notes</span>
+                      <input type="text" class="detail-input" placeholder="Add notes">
+                    </div>
+                  </div>
+                  
+                  <div class="detail-divider"></div>
+                  
+                  <div class="detail-section-title">Flashy Drinks</div>
+                  <div class="detail-section">
+                    <div class="detail-item">
+                      <span class="detail-label">Display quality</span>
+                      <select class="detail-select">
+                        <option>Excellent</option>
+                        <option>Good</option>
+                        <option>Average</option>
+                        <option>Poor</option>
+                      </select>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Promotion active</span>
+                      <label class="toggle-inline">
+                        <input type="checkbox">
+                        <span class="toggle-slider"></span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="grid-row">
+                <div class="grid-cell product-cell">
+                  <span class="expand-arrow" onclick="toggleExpand(this)">›</span>
+                  <span class="product-image">🍿</span>
+                  <div class="product-details">
+                    <div class="product-name">Popcorn Pack</div>
+                    <div class="product-meta">Listed +2</div>
+                  </div>
+                </div>
+                <div class="grid-cell input-cell standard-activity"><input type="number" placeholder="Count"></div>
+                <div class="grid-cell input-cell standard-activity"><input type="text" placeholder="Price"></div>
+                <div class="grid-cell input-cell standard-activity">
+                  <div class="button-group-inline">
+                    <button class="yes-btn">Yes</button>
+                    <button class="no-btn">No</button>
+                    <button class="oqs-btn">OOS</button>
+                  </div>
+                </div>
+                <div class="grid-cell input-cell flashy-activity"><input type="text" placeholder="Price"></div>
+                <div class="grid-cell input-cell flashy-activity">
+                  <label class="toggle-inline">
+                    <input type="checkbox">
+                    <span class="toggle-slider"></span>
+                  </label>
+                </div>
+                <div class="grid-cell input-cell flashy-activity">
+                  <select class="dropdown-inline">
+                    <option>Select</option>
+                    <option>Eye</option>
+                    <option>Waist</option>
+                    <option>Knee</option>
+                  </select>
+                </div>
+              </div>
+              <div class="detail-row">
+                <div class="detail-content">
+                  <div class="detail-section-title">Product Details</div>
+                  <div class="detail-section">
+                    <div class="detail-item">
+                      <span class="detail-label">Product number</span>
+                      <span class="detail-value">7990000000058</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Gtin</span>
+                      <span class="detail-value">4010900000054</span>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Category</span>
+                      <span class="detail-value">Snacks</span>
+                    </div>
+                  </div>
+                  
+                  <div class="detail-divider"></div>
+                  
+                  <div class="detail-section-title">Standard Survey Activities</div>
+                  <div class="detail-section">
+                    <div class="detail-item">
+                      <span class="detail-label">Stock verification</span>
+                      <div class="button-group-inline">
+                        <button class="yes-btn">Yes</button>
+                        <button class="no-btn">No</button>
+                        <button class="oqs-btn">OOS</button>
+                      </div>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Surveyor notes</span>
+                      <input type="text" class="detail-input" placeholder="Add notes">
+                    </div>
+                  </div>
+                  
+                  <div class="detail-divider"></div>
+                  
+                  <div class="detail-section-title">Flashy Drinks</div>
+                  <div class="detail-section">
+                    <div class="detail-item">
+                      <span class="detail-label">Display quality</span>
+                      <select class="detail-select">
+                        <option>Excellent</option>
+                        <option>Good</option>
+                        <option>Average</option>
+                        <option>Poor</option>
+                      </select>
+                    </div>
+                    <div class="detail-item">
+                      <span class="detail-label">Promotion active</span>
+                      <label class="toggle-inline">
+                        <input type="checkbox">
+                        <span class="toggle-slider"></span>
+                      </label>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Numeric Keyboard -->
+          <div id="numericKeyboard" class="numeric-keyboard">
+            <div class="keyboard-input-display" id="keyboardDisplay"></div>
+            <div class="keyboard-buttons">
+              <button class="key-btn" onclick="keyboardPress('1')">1</button>
+              <button class="key-btn" onclick="keyboardPress('2')">2</button>
+              <button class="key-btn" onclick="keyboardPress('3')">3</button>
+              <button class="key-btn" onclick="keyboardPress('4')">4</button>
+              <button class="key-btn" onclick="keyboardPress('5')">5</button>
+              <button class="key-btn" onclick="keyboardPress('6')">6</button>
+              <button class="key-btn" onclick="keyboardPress('7')">7</button>
+              <button class="key-btn" onclick="keyboardPress('8')">8</button>
+              <button class="key-btn" onclick="keyboardPress('9')">9</button>
+              <button class="key-btn" onclick="keyboardPress('0')">0</button>
+              <button class="key-btn dot-btn" onclick="keyboardPress('.')">.</button>
+              <button class="key-btn backspace-btn" onclick="keyboardBackspace()">⌫</button>
+            </div>
+            <div class="keyboard-actions">
+              <button class="key-btn-cancel" onclick="closeNumericKeyboard()">Cancel</button>
+              <button class="key-btn-ok" onclick="confirmNumericKeyboard()">OK</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentTab = 'all';
+    let aiEnabled = true;
+
+    // Toggle Expand Details Row
+    function toggleExpand(arrow) {
+      const row = arrow.closest('.grid-row');
+      const detailRow = row.nextElementSibling;
+      
+      arrow.classList.toggle('rotated');
+      if (detailRow && detailRow.classList.contains('detail-row')) {
+        detailRow.classList.toggle('show');
+      }
+    }
+
+    // Remove old tab switching
+    function switchTab(tabName, button) {
+      // Removed - no longer needed
+    }
+
+    // Toggle Expand All
+    function toggleExpandAll(button) {
+      button.classList.toggle('expanded');
+      const allDetailRows = document.querySelectorAll('.detail-row');
+      const allArrows = document.querySelectorAll('.expand-arrow');
+      
+      if (button.classList.contains('expanded')) {
+        // Expand all
+        allDetailRows.forEach(row => row.classList.add('show'));
+        allArrows.forEach(arrow => arrow.classList.add('rotated'));
+      } else {
+        // Collapse all
+        allDetailRows.forEach(row => row.classList.remove('show'));
+        allArrows.forEach(arrow => arrow.classList.remove('rotated'));
+      }
+    }
+
+    // Toggle Category Filter
+    function toggleCategoryFilter() {
+      const dropdown = document.getElementById('categoryDropdown');
+      const button = document.getElementById('categoryBtn');
+      dropdown.classList.toggle('show');
+      button.classList.toggle('active');
+      
+      // Close products dropdown
+      document.getElementById('productsDropdown').classList.remove('show');
+      document.getElementById('productsBtn').classList.remove('active');
+    }
+
+    // Toggle Products Filter
+    function toggleProductsFilter() {
+      const dropdown = document.getElementById('productsDropdown');
+      const button = document.getElementById('productsBtn');
+      dropdown.classList.toggle('show');
+      button.classList.toggle('active');
+      
+      // Close category dropdown
+      document.getElementById('categoryDropdown').classList.remove('show');
+      document.getElementById('categoryBtn').classList.remove('active');
+    }
+
+    // Select Category
+    function selectCategory(category, element) {
+      const button = document.getElementById('categoryBtn');
+      let categoryText = '';
+      
+      if (category === 'all') {
+        categoryText = 'All Categories';
+      } else if (category === 'beverages') {
+        categoryText = 'Beverages';
+      } else if (category === 'snacks') {
+        categoryText = 'Snacks';
+      }
+      
+      // Update button text
+      button.innerHTML = `<span class="filter-option-icon">📦</span>${categoryText}<span class="filter-option-arrow">▼</span>`;
+      
+      // Update checkmarks
+      document.querySelectorAll('#categoryDropdown .dropdown-item').forEach(item => {
+        const checkmark = item.querySelector('.checkmark');
+        if (checkmark) checkmark.remove();
+      });
+      element.innerHTML = element.innerHTML + '<span class="checkmark">✓</span>';
+      
+      // Close dropdown
+      document.getElementById('categoryDropdown').classList.remove('show');
+      button.classList.remove('active');
+      
+      console.log('Selected category:', category);
+    }
+
+    // Select Product
+    function selectProduct(product, element) {
+      const button = document.getElementById('productsBtn');
+      let productText = '';
+      
+      if (product === 'all') {
+        productText = 'All Products';
+      } else if (product === 'promoted') {
+        productText = 'Promoted';
+      } else if (product === 'discrepancies') {
+        productText = 'Discrepancies';
+      }
+      
+      // Update button text
+      button.innerHTML = `<span class="filter-option-icon">🏷️</span>${productText}<span class="filter-option-arrow">▼</span>`;
+      
+      // Update checkmarks
+      document.querySelectorAll('#productsDropdown .dropdown-item').forEach(item => {
+        const checkmark = item.querySelector('.checkmark');
+        if (checkmark) checkmark.remove();
+      });
+      element.innerHTML = element.innerHTML + '<span class="checkmark">✓</span>';
+      
+      // Close dropdown
+      document.getElementById('productsDropdown').classList.remove('show');
+      button.classList.remove('active');
+      
+      console.log('Selected product:', product);
+    }
+
+    // Handle Button Group Clicks (Yes/No/OOS)
+    document.addEventListener('click', function(event) {
+      const button = event.target.closest('.yes-btn, .no-btn, .oqs-btn');
+      if (!button) return;
+      
+      const buttonGroup = button.closest('.button-group-inline');
+      if (!buttonGroup) return;
+      
+      // Remove active state from all buttons in this group
+      buttonGroup.querySelectorAll('.yes-btn, .no-btn, .oqs-btn').forEach(btn => {
+        btn.classList.remove('active');
+        // Reset to white background
+        btn.style.background = 'white';
+        btn.style.color = '#0f172a';
+      });
+      
+      // Add active state to clicked button
+      button.classList.add('active');
+      button.style.background = '#0052CC';
+      button.style.color = 'white';
+      
+      console.log('Button clicked:', button.textContent, 'in group:', buttonGroup);
+    });
+
+    // Close dropdowns when clicking outside
+    document.addEventListener('click', function(event) {
+      const filterOptions = document.querySelectorAll('.filter-option');
+      const isClickingFilter = Array.from(filterOptions).some(option => option.contains(event.target));
+      
+      if (!isClickingFilter) {
+        document.getElementById('categoryDropdown').classList.remove('show');
+        document.getElementById('productsDropdown').classList.remove('show');
+        document.getElementById('categoryBtn').classList.remove('active');
+        document.getElementById('productsBtn').classList.remove('active');
+      }
+    });
+
+    // Add Products
+    function addProducts() {
+      console.log('Add Products clicked');
+      alert('Add new products - ready for implementation');
+    }
+
+    // Scan Product
+    function scanProduct() {
+      console.log('Scan button clicked');
+      alert('Scan product using camera - ready for implementation');
+    }
+
+    function toggleAI(button) {
+      button.classList.toggle('active');
+      aiEnabled = !aiEnabled;
+    }
+
+    function updateSearch() {
+      const searchValue = document.getElementById('searchInput').value;
+      console.log('Search:', searchValue);
+    }
+
+    function updateContextBadge() {
+      // Removed - no longer needed with new filter bar
+    }
+
+    // Filter dropdown functions
+    function toggleFilterDropdown() {
+      const dropdown = document.getElementById('filterDropdown');
+      dropdown.classList.toggle('show');
+    }
+
+    function filterProducts(category, element) {
+      // Update button text
+      const filterBtn = document.querySelector('.filter-btn-group');
+      let buttonText = '';
+      
+      if (category === 'all') {
+        buttonText = 'All Categories';
+      } else if (category === 'beverages') {
+        buttonText = 'Beverages';
+      } else if (category === 'snacks') {
+        buttonText = 'Snacks';
+      } else if (category === 'dairy') {
+        buttonText = 'Dairy';
+      }
+      
+      filterBtn.innerHTML = `<span class="filter-icon">📦</span>${buttonText}<span class="dropdown-arrow">▼</span>`;
+      
+      // Update checkmarks in dropdown
+      document.querySelectorAll('.dropdown-item').forEach(item => {
+        item.classList.remove('active');
+        if (item.textContent.includes(buttonText)) {
+          item.innerHTML = item.innerHTML.replace('</span>', '</span><span class="checkmark">✓</span>');
+        } else if (item.querySelector('.checkmark')) {
+          item.querySelector('.checkmark').remove();
+        }
+      });
+      
+      // Close dropdown
+      const dropdown = document.getElementById('filterDropdown');
+      dropdown.classList.remove('show');
+      
+      console.log('Filtered by:', category);
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(event) {
+      const filterButtons = document.querySelector('.filter-buttons');
+      if (filterButtons && !filterButtons.contains(event.target)) {
+        const dropdown = document.getElementById('filterDropdown');
+        if (dropdown) {
+          dropdown.classList.remove('show');
+        }
+      }
+    });
+
+    // ========== NUMERIC KEYBOARD ==========
+    let currentKeyboardInput = null;
+    let keyboardValue = '';
+
+    // Open numeric keyboard
+    function openNumericKeyboard(event) {
+      const input = event.target.closest('input[type="number"], input[type="text"].price-input');
+      if (!input) return;
+      
+      const keyboardContainer = document.getElementById('numericKeyboard');
+      const keyboardDisplay = document.getElementById('keyboardDisplay');
+      
+      currentKeyboardInput = input;
+      keyboardValue = input.value || '';
+      keyboardDisplay.textContent = keyboardValue;
+      
+      keyboardContainer.classList.add('show');
+    }
+
+    // Keyboard key press
+    function keyboardPress(value) {
+      if (value === '.') {
+        // Only allow one decimal point
+        if (!keyboardValue.includes('.')) {
+          keyboardValue += value;
+        }
+      } else {
+        keyboardValue += value;
+      }
+      
+      document.getElementById('keyboardDisplay').textContent = keyboardValue;
+    }
+
+    // Keyboard backspace
+    function keyboardBackspace() {
+      keyboardValue = keyboardValue.slice(0, -1);
+      document.getElementById('keyboardDisplay').textContent = keyboardValue;
+    }
+
+    // Close keyboard
+    function closeNumericKeyboard() {
+      document.getElementById('numericKeyboard').classList.remove('show');
+      keyboardValue = '';
+      currentKeyboardInput = null;
+    }
+
+    // Confirm keyboard
+    function confirmNumericKeyboard() {
+      if (currentKeyboardInput) {
+        currentKeyboardInput.value = keyboardValue;
+      }
+      closeNumericKeyboard();
+    }
+
+    // Attach keyboard to number and price inputs
+    document.addEventListener('DOMContentLoaded', function() {
+      // Find all Facings (number) and Price inputs
+      document.querySelectorAll('input[type="number"]').forEach(input => {
+        input.classList.add('numeric-input');
+        input.addEventListener('focus', openNumericKeyboard);
+        input.setAttribute('inputmode', 'none');
+      });
+
+      // Mark price inputs with text type
+      document.querySelectorAll('input[type="text"]').forEach(input => {
+        if (input.placeholder.includes('Price') || input.placeholder.includes('price') || 
+            input.placeholder.includes('3.50') || input.placeholder.includes('4.00')) {
+          input.classList.add('price-input');
+          input.addEventListener('focus', openNumericKeyboard);
+          input.setAttribute('inputmode', 'none');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
